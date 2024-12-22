@@ -1,30 +1,52 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 
-interface Post {
-  id: number;
-  author: string;
-  title: string;
-  content: string;
-}
-
-const postList: Post[] = [
-  { id: 1, author: '홍길동', title: '길동', content: '의적 활동하는 홍길동' },
-  { id: 2, author: '홍동', title: '길동', content: '의적 활동하는 홍길동' },
-  { id: 3, author: '동', title: '길동', content: '의적 활동하는 홍길동' },
-];
-
+// 최전방에서 요청이 어디로 가야할지 라우팅해주는 것
+// 로직은 서비스 파일에 정리하고 서비스 파일을 불러와서 사용 할 것
+// 논리 === 서비스 파일
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  getPosts(): Post[] {
-    return postList;
+  getPosts() {
+    return this.postsService.getAllPosts();
   }
 
   @Get(':id')
-  getPost(@Param('id') id: number) {
-    return postList.find(({ id: postId }) => postId === +id);
+  getPost(@Param('id') id: string) {
+    return this.postsService.getPostById(+id);
+  }
+
+  @Post()
+  postPost(
+    @Body('author') author: string,
+    @Body('title') title: string,
+    @Body('content') content: string,
+  ) {
+    return this.postsService.createPost(author, title, content);
+  }
+
+  @Patch(':id')
+  patchPost(
+    @Param('id') id: string,
+    @Body('author') author?: string,
+    @Body('title') title?: string,
+    @Body('content') content?: string,
+  ) {
+    return this.postsService.updatePost(+id, author, title, content);
+  }
+
+  @Delete(':id')
+  deletePost(@Param('id') id: string) {
+    return this.postsService.deletePost(+id);
   }
 }
