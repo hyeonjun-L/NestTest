@@ -1,0 +1,24 @@
+# 우리가 실행하는 서비스를 정의하는 위치
+services:
+  # 우리가 지어주는 서비스 이름
+  postgres:
+    # 어떤 이미지를 사용할지 정의
+    image: postgres:15
+    # 실행할 때마다 재시작
+    restart: always
+    # 도커이미지 안에서 실행 및 생성됐던 파일들은 도커이미지 안에서만 존재한다.
+    # 즉 도커를 종료시키면 그 이미지안에 있던 파일들이 사라질 수 있다.
+    # 그렇기 때문에 실제 postgresql에 저장했던 데이터를 실제 Host OS에 volume과 매핑을 해준다.
+    # 서로의 싱크가 맞게 된다.
+    # 현재 Host OS 위치:실제 이미지안에 있는 폴더 (이미지 상에서 데이터를 저장했을때 입력되는 위치)
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    # image 속의 포트와 host os의 포트를 매핑해준다.
+    # 호스트 머신의 5432 포트를 통해 PostgreSQL 서버(컨테이너 내부의 5432 포트)에 접근할 수 있게 만듭니다.
+    ports:
+      - '5432:5432'
+    # 데이터베이스에 대한 정보를 추가로 넣어줄 수 있다.
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
